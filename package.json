@@ -1,0 +1,26 @@
+{
+  "name": "shopify-dev-challenge-summer-2022",
+  "version": "1.0.0",
+  "description": "Inventory tracking web application. Part of Shopify 2022 dev intern application.",
+  "main": "Front-End/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eli-fridlender/Shopify-Dev-Challenge-Summer-2022.git"
+  },
+  "author": "Eli Fridlender <elifridlender@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eli-fridlender/Shopify-Dev-Challenge-Summer-2022/issues"
+  },
+  "homepage": "https://github.com/eli-fridlender/Shopify-Dev-Challenge-Summer-2022#readme",
+  "dependencies": {
+    "mocha": "^9.1.4",
+    "rewire": "^6.0.0"
+  }
+}
