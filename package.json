@@ -21,6 +21,7 @@
   "homepage": "https://github.com/eli-fridlender/Shopify-Dev-Challenge-Summer-2022#readme",
   "dependencies": {
     "mocha": "^9.1.4",
-    "rewire": "^6.0.0"
+    "rewire": "^6.0.0",
+    "sqlite3": "^5.0.2"
   }
 }
