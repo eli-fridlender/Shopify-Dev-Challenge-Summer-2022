@@ -7,7 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --timeout 10000",
+    "build": "browserify -g reactify Front-End/index.js -o Front-End/app.js"
   },
   "repository": {
     "type": "git",
@@ -20,8 +21,13 @@
   },
   "homepage": "https://github.com/eli-fridlender/Shopify-Dev-Challenge-Summer-2022#readme",
   "dependencies": {
+    "express": "^4.17.2",
     "mocha": "^9.1.4",
-    "rewire": "^6.0.0",
-    "sqlite3": "^5.0.2"
+    "reactify": "^1.1.1",
+    "rewire": "^6.0.0"
+  },
+  "devDependencies": {
+    "sqlite3": "^5.0.2",
+    "browserify": "^17.0.0"
   }
 }
