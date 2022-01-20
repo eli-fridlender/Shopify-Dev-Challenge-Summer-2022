@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h1>Inventory Manager:</h1>
+        <div style="display:flex;">
+            <h2 style="margin-right: 1rem;">Items:</h2>
+            <button onclick="document.location='create-item'">Add Item</button>
+            <button onclick=updateProductElements()>Refresh</button>
+            <button onclick=exportCSVData()>Export CSV</button>
+        </div>
+        <table id="inventoryItems" style="overflow: scroll;">
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Quantity</th>
+            </tr>
+        </table>
+    </body>
+</html>
+
+<script>
+    const exportCSVData = () => {
+        let fileName = prompt("Please enter a name for the file", "Data.csv");
+        if (fileName != null) {
+            fileName = fileName.includes(".csv") ? fileName : fileName + ".csv"; 
+            httpGet(`/export-csv?fileName=${fileName}`);
+        }
+        else{
+            alert("File name not provided!");
+        }
+    }
+
+    const httpGet = (theUrl) => {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false );
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+        }
+
+    const httpAltereState = (theUrl, requestType, id) => {
+        var xhr = new XMLHttpRequest();
+        xhr.open(requestType, theUrl, false);
+
+        //Send the proper header information along with the request
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function() { // Call a function when the state changes.
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+
+                // Request finished. Do processing here.
+            }
+        }
+        xhr.send(`id=${id}`);
+    }
+
+    function editProduct(){
+        document.location=`/go-to-edit-item?id=${this.parentNode.id}`;
+        console.log("edit")
+    }
+
+    function deleteProduct(){
+        let resp = httpAltereState('/delete-item', 'DELETE', this.parentNode.id);
+        console.log("delete");
+        updateProductElements();        
+    }
+
+    const updateProductElements = () => {
+        document.getElementById("inventoryItems").innerHTML = ""; //clearing
+        let resp = httpGet('/get-all-items');
+        console.log(resp);
+        let parsedResp = JSON.parse(resp);
+        const itemsElement = document.getElementById("inventoryItems");
+        for(const record of parsedResp.data){
+            let row = createItemElement(record);
+            console.log(row)
+            itemsElement.append(row);
+        }
+    }
+
+    const createItemElement = (data) => {
+        if(Object.keys(data).length > 0){
+            let tableRow = document.createElement("tr");
+            for(const key of Object.keys(data)){
+                let rowItem = document.createElement("td");
+                rowItem.append(document.createTextNode(data[key]));
+                tableRow.append(rowItem);
+            }
+            let editButton = document.createElement("button");
+            editButton.append(document.createTextNode("Edit"));
+            editButton.onclick = editProduct;
+
+            let deleteButton = document.createElement("button");
+            deleteButton.append(document.createTextNode("Delete"));
+            deleteButton.onclick = deleteProduct;
+            
+            tableRow.append(editButton);
+            tableRow.append(deleteButton);
+
+            tableRow.id = data["id"];
+            return tableRow;
+        }
+        else{
+            return null;
+        }
+    }
+
+    window.onload = updateProductElements
+
+</script>

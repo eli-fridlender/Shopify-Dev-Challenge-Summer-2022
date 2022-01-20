@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <script>
+            function getItemID(){
+                let urlTokens = window.location.href.split("?");
+                let queryparam = urlTokens.length > 1 ? urlTokens[urlTokens.length-1] : null;
+                let parsedResp;
+                if(queryparam){
+                    let resp = httpGet(`/item?${queryparam}`);
+                    console.log(resp);
+                    parsedResp = JSON.parse(resp);
+                }
+                return parsedResp && parsedResp.data ? parsedResp.data.id : "";
+            }
+
+            function setVariables(){
+                let urlTokens = window.location.href.split("?");
+                let queryparam = urlTokens.length > 1 ? urlTokens[urlTokens.length-1] : null;
+                let parsedResp;
+                if(queryparam){
+                    let resp = httpGet(`/item?${queryparam}`);
+                    console.log(resp);
+                    parsedResp = JSON.parse(resp);
+                }
+        
+                let id = parsedResp && parsedResp.data ? parsedResp.data.id : "";
+                console.log(id);
+                let titleElement = document.getElementById("title");
+                let descriptionElement = document.getElementById("description");
+                let quantityElement = document.getElementById("quantity");
+
+                titleElement.append(document.createTextNode(parsedResp && parsedResp.data? parsedResp.data.title : ""));
+                descriptionElement.append(document.createTextNode(parsedResp && parsedResp.data ? parsedResp.data.description : ""));
+                quantityElement.append(document.createTextNode(parsedResp && parsedResp.data ? parsedResp.data.quantity : ""));
+
+            }
+
+            const httpGet = (theUrl) => {
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open( "GET", theUrl, false );
+                xmlHttp.send( null );
+                return xmlHttp.responseText;
+            }
+
+            const getCurrentItem = () => {
+                let url = window.location.href;
+                let tokens = url.split("/");
+                let id = tokens[tokens.length-1];
+                console.log(id);
+            }
+
+            const updateItem = async () => {
+                let body = {
+                    "title": document.getElementById("title").textContent,
+                    "description": document.getElementById("description").textContent,
+                    "quantity": document.getElementById("quantity").textContent,
+                    "id": getItemID()
+                }
+                console.log(body);
+                let resp = isUpdateValid(body);
+                if(resp.isValid){
+                    httpAltereState('/update-item', "PUT", body);
+                    alert("Successfully updated item.")
+                }
+                else{
+                    alert(resp.msg);
+                }
+            }
+
+            const isUpdateValid = (body) => {
+                const responseObj = {
+                    "isValid": true,
+                    "msg": ""
+                };
+
+                if(isNaN(parseInt(body.quantity))){
+                    responseObj.isValid = false;
+                    responseObj.msg = "Could not update item; Quantity is not a valid input. Needs to be an integer."
+                    return responseObj;
+                }
+                if(isNaN(parseInt(body.id))){
+                    responseObj.isValid = false;
+                    responseObj.msg = "Could not update item; Id for product could not be found."
+                    return responseObj;
+                }
+
+                return responseObj;
+            }
+
+            const httpAltereState = (theUrl, requestType, body) => {
+                var xhr = new XMLHttpRequest();
+                xhr.open(requestType, theUrl, false);
+        
+                //Send the proper header information along with the request
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        
+                let requestBody = Object.keys(body).map((key) => `${key}=${body[key]}`).join('&');
+                xhr.send(requestBody);
+            }
+
+            window.onload = setVariables
+        </script>
+
+        <h1>Inventory Manager:</h1>
+        <div>
+            <h2 style="margin-right: 1rem;">Edit An Item:</h2>
+            <h4 style="margin-right: 1rem;">(click on property to edit)</h4>
+            <label for="title">Title:</label><br>
+            <div id=title contenteditable="true"></div><br>
+            <label for="description">Description:</label><br>
+            <div id=description contenteditable="true"></div><br>
+            <label for="quantity">Quantity:</label><br>
+            <div id=quantity contenteditable="true"></div><br>
+            <button onclick=updateItem()>Save</button>
+        </div>
+    </body>
+</html>
+

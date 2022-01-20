@@ -1,6 +1,9 @@
 const constants = require('./lib/constants');
 const queries = require('./lib/queries');
 const sqliteUtils = require("./lib/sqliteUtils");
+const { Parser } = require('json2csv');
+const fs = require('fs');
+
 
 const createItem = async (db, data) => {
 
@@ -15,7 +18,7 @@ const createItem = async (db, data) => {
     }
     else{
         //bad item.
-        console.log("bad item");
+        console.log("Item is invalid");
     }
 
 }
@@ -50,6 +53,20 @@ const initializeInventoryManager = async () => {
     return db;
 }
 
+const exportCSV = async (db, path) => {
+    let items = await getAllItems(db);
+    const json2csvParser = new Parser();
+    const csv = json2csvParser.parse(items);
+    fs.writeFile(path, csv, 'utf8', function (err) {
+        if (err) {
+          console.log('Some error occured - file either not saved or corrupted file saved.');
+        } 
+        else{
+          console.log('CSV has been saved.');
+        }
+      });
+}
+
 /**
  * Checks that data provided for an item is correct.
  * 
@@ -75,11 +92,6 @@ const isValidItem = itemData => {
     return true;
 }
 
-function sleep(ms) {
-    return new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
-}
 
 module.exports = {
     initializeInventoryManager,
@@ -87,5 +99,6 @@ module.exports = {
     deleteItem,
     updateItem,
     getAllItems,
-    getItem
+    getItem,
+    exportCSV
 }
